@@ -40,13 +40,13 @@ func main() {
 		hasIndex bool
 	)
 	rows, err := db.Query(fmt.Sprintf(`select t.table_name,
-		max(case when column_name = 'updated' then 1 else 0 end) as has_column,
+		max(case when column_name = '%v' then 1 else 0 end) as has_column,
 		case when x.table_name is not null then true else false end as has_index
 		from information_schema.columns t left join 
 			(select distinct table_name 
 			from information_schema.statistics 
 			where table_schema = '%v' and column_name = '%v' and seq_in_index = 1) x on t.table_name = x.table_name
-		where table_schema = '%v' group by t.table_name;`, *database, *column, *database))
+		where table_schema = '%v' group by t.table_name;`, *column, *database, *column, *database))
 	defer rows.Close()
 	var haveIndex, needIndex, needColumn []string
 	for rows.Next() {
