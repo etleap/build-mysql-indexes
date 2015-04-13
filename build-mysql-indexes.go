@@ -78,7 +78,7 @@ func main() {
 		fmt.Printf("\nAll tables have the '%v' column.\n", *column)
 	}
 	if len(needIndex) > 0 {
-		fmt.Printf("\nAn index on the '%v' column will be added to the following tables:\n%v\n", *column, strings.Join(needIndex, ", "))
+		fmt.Printf("\nAn index on the '%v' column named 'index_<table>_on_%v' will be added to the following tables:\n%v\n", *column, *column, strings.Join(needIndex, ", "))
 	} else {
 		fmt.Printf("\nNo indexes to add\n")
 	}
@@ -89,7 +89,7 @@ func main() {
 	}
 	for _, table := range needIndex {
 		fmt.Println("Adding index to " + table)
-		rows, err := db.Query(fmt.Sprint("alter table `", table, "` add key (`", *column, "`)"))
+		rows, err := db.Query(fmt.Sprintf("alter table `%v` add key `index_%v_on_%v` (`%v`)", table, table, *column, *column))
 		defer rows.Close()
 		if err != nil {
 			panic(err.Error())
