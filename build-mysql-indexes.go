@@ -89,7 +89,14 @@ func main() {
 	}
 	for _, table := range needIndex {
 		fmt.Println("Adding index to " + table)
-		rows, err := db.Query(fmt.Sprintf("alter table `%v` add key `index_%v_on_%v` (`%v`)", table, table, *column, *column))
+		var indexName string
+		if len(table + *column) > 54 {
+			fmt.Printf("Index name %v would be too long, using default name.\n", fmt.Sprintf("`index_%v_on_%v`", table, *column))
+			indexName = ""
+		} else {
+			indexName = fmt.Sprintf("`index_%v_on_%v`", table, *column)
+		}
+		rows, err := db.Query(fmt.Sprintf("alter table `%v` add key %v (`%v`)", table, indexName, *column))
 		defer rows.Close()
 		if err != nil {
 			panic(err.Error())
